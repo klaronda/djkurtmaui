@@ -1,0 +1,81 @@
+# DJ Kurt Maui Website - Cursor AI Rules
+
+## Project Context
+This is a professional DJ website for DJ Kurt, a Maui-based wedding and event DJ. The project uses React, TypeScript, Tailwind CSS, and Supabase.
+
+## Tech Stack
+- **Frontend**: React 18, TypeScript, Tailwind CSS v4.0, shadcn/ui components
+- **Backend**: Supabase (PostgreSQL, Storage, Auth, Edge Functions)
+- **Build Tool**: Vite
+- **State Management**: React hooks (useState, useEffect)
+- **Forms**: React Hook Form
+- **Drag & Drop**: @dnd-kit
+- **Notifications**: Sonner
+
+## Project Structure
+- All source code is in `/src/` directory
+- Components in `/src/components/`
+- Utilities in `/src/utils/`
+- Edge functions in `/src/supabase/functions/server/`
+- Styles in `/src/styles/`
+
+## Database Schema
+The project uses these PostgreSQL tables:
+- `featured_videos` - Hero video configuration
+- `photos` - Gallery images with display_order
+- `mixes` - Sample mixes (Spotify/Mixcloud)
+- `testimonials` - Client reviews with ratings
+- `venues` - Trusted venue partners
+- `contact_submissions` - Contact form entries
+
+## Storage Buckets
+- `photos` - Gallery images (public read, authenticated write)
+- `testimononial-images` - Client testimonial photos
+- `venue-logos` - Venue partner logos
+
+## Coding Standards
+- Use TypeScript for all files
+- Use functional components with hooks
+- Follow existing component patterns
+- Use Tailwind CSS for styling (defined in globals.css)
+- Use shadcn/ui components from `/components/ui/`
+- Environment variables prefixed with `VITE_`
+- Use async/await for API calls
+- Handle errors gracefully with try/catch
+
+## Design System
+- **Colors**: Gold (#D4AF37), Bronze (#CD7F32), Teal (#008B8B), Coral (#FF6F61)
+- **Base**: Charcoal (#1A1A1A), Grays
+- **Typography**: System font stack (defined in globals.css)
+- **Max content width**: 1200px
+- **Section padding**: 80px vertical (desktop), 40px (mobile)
+
+## Security
+- Never commit `.env.local` or `.env` files
+- Use environment variables for all Supabase credentials
+- Row Level Security (RLS) enabled on all tables
+- Authenticated users only for CMS operations
+- Public read access for content tables
+
+## Current Status
+- Frontend is complete and functional
+- Backend currently uses KV store (needs migration to SQL)
+- Need to migrate server endpoints from KV to PostgreSQL
+- Need to implement file uploads to Supabase Storage
+- Contact form needs backend integration
+
+## Common Patterns
+- API calls use `/utils/api.ts` with fetchAPI helper
+- Auth uses Supabase Auth via `authAPI` from `/utils/api.ts`
+- CMS operations use `cmsAPI` from `/utils/api.ts`
+- Images use `ImageWithFallback` component from `/components/figma/`
+- Toast notifications use Sonner (`toast.success()`, `toast.error()`)
+
+## Migration Notes
+- Currently migrating from KV store to PostgreSQL
+- Follow MIGRATION_GUIDE.md for endpoint migration patterns
+- Update file uploads from base64 to Supabase Storage
+- All endpoints should use Supabase client with service role key
+
+
+
