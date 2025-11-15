@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { Play } from 'lucide-react';
-import { OptimizedSupabaseImage } from './OptimizedSupabaseImage';
-
-// Hero image from Supabase Storage
-const heroImageUrl =
-  'https://oxecaqattfrvtrqhsvtn.supabase.co/storage/v1/object/public/photos/page-assets/hero.jpg';
 
 export function Hero() {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -28,16 +23,14 @@ export function Hero() {
     <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
       {/* Hero Background Image */}
       <div className="absolute inset-0 z-0">
-        <OptimizedSupabaseImage
-          objectSrc={heroImageUrl}
+        <img
+          src="/hero.webp"
           alt="DJ Kurt at his professional setup with Maui oceanfront backdrop"
           className={`w-full h-full object-cover transition-opacity duration-1000 ease-out ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
           loading="eager"
           decoding="async"
           fetchPriority="high"
           sizes="100vw"
-          widths={[640, 960, 1280, 1600]}
-          quality={60}
           onLoad={() => setImageLoaded(true)}
         />
         <div className="absolute inset-0 bg-black/60"></div>
