@@ -34,7 +34,8 @@ export function Hero() {
           decoding="async"
           fetchPriority="high"
           sizes="100vw"
-          widths={[640, 960, 1280, 1600, 1920]}
+          widths={[640, 960, 1280, 1600]}
+          quality={60}
         />
         <div className="absolute inset-0 bg-black/60"></div>
       </div>

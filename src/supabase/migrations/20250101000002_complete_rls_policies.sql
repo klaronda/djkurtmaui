@@ -28,23 +28,24 @@ ON featured_videos
 FOR SELECT 
 USING (is_active = true);
 
--- Authenticated users can insert videos
-CREATE POLICY "Authenticated users can insert videos" 
+-- Anyone can insert featured videos
+CREATE POLICY "Anyone can insert featured videos" 
 ON featured_videos 
 FOR INSERT 
-WITH CHECK (auth.role() = 'authenticated');
+WITH CHECK (true);
 
--- Authenticated users can update videos
-CREATE POLICY "Authenticated users can update videos" 
+-- Anyone can update featured videos
+CREATE POLICY "Anyone can update featured videos" 
 ON featured_videos 
 FOR UPDATE 
-USING (auth.role() = 'authenticated');
+USING (true)
+WITH CHECK (true);
 
--- Authenticated users can delete videos
-CREATE POLICY "Authenticated users can delete videos" 
+-- Anyone can delete featured videos
+CREATE POLICY "Anyone can delete featured videos" 
 ON featured_videos 
 FOR DELETE 
-USING (auth.role() = 'authenticated');
+USING (true);
 
 -- ==================== PHOTOS ====================
 
