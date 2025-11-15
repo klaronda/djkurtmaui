@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Menu, X } from 'lucide-react';
+import { scrollToSection } from '../utils/scroll-section';
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,12 +16,12 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setIsMobileMenuOpen(false);
+  const navigateTo = (sectionId: string, path: string) => {
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
     }
+    scrollToSection(sectionId);
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -42,37 +43,37 @@ export function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           <button 
-            onClick={() => scrollToSection('home')}
+            onClick={() => navigateTo('home', '/')}
             className={`hover:text-yellow-500 transition-colors ${isScrolled ? 'text-gray-700' : 'text-white'}`}
           >
             Home
           </button>
           <button 
-            onClick={() => scrollToSection('about')}
+            onClick={() => navigateTo('about', '/about')}
             className={`hover:text-yellow-500 transition-colors ${isScrolled ? 'text-gray-700' : 'text-white'}`}
           >
             About
           </button>
           <button 
-            onClick={() => scrollToSection('services')}
+            onClick={() => navigateTo('services', '/services')}
             className={`hover:text-yellow-500 transition-colors ${isScrolled ? 'text-gray-700' : 'text-white'}`}
           >
             Services
           </button>
           <button 
-            onClick={() => scrollToSection('media')}
+            onClick={() => navigateTo('media', '/media')}
             className={`hover:text-yellow-500 transition-colors ${isScrolled ? 'text-gray-700' : 'text-white'}`}
           >
             Media
           </button>
           <button 
-            onClick={() => scrollToSection('testimonials')}
+            onClick={() => navigateTo('testimonials', '/testimonials')}
             className={`hover:text-yellow-500 transition-colors ${isScrolled ? 'text-gray-700' : 'text-white'}`}
           >
             Testimonials
           </button>
           <button 
-            onClick={() => scrollToSection('contact')}
+            onClick={() => navigateTo('contact', '/contact')}
             className={`hover:text-yellow-500 transition-colors ${isScrolled ? 'text-gray-700' : 'text-white'}`}
           >
             Contact
@@ -81,7 +82,7 @@ export function Header() {
 
         <div className="flex items-center space-x-4">
           <Button 
-            onClick={() => scrollToSection('contact')}
+            onClick={() => navigateTo('contact', '/book')}
             className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-white px-6 py-2"
           >
             Book Now
@@ -102,37 +103,37 @@ export function Header() {
         <div className="md:hidden bg-white/95 backdrop-blur-md border-t">
           <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4">
             <button 
-              onClick={() => scrollToSection('home')}
+              onClick={() => navigateTo('home', '/')}
               className="text-gray-700 hover:text-yellow-500 transition-colors text-left"
             >
               Home
             </button>
             <button 
-              onClick={() => scrollToSection('about')}
+              onClick={() => navigateTo('about', '/about')}
               className="text-gray-700 hover:text-yellow-500 transition-colors text-left"
             >
               About
             </button>
             <button 
-              onClick={() => scrollToSection('services')}
+              onClick={() => navigateTo('services', '/services')}
               className="text-gray-700 hover:text-yellow-500 transition-colors text-left"
             >
               Services
             </button>
             <button 
-              onClick={() => scrollToSection('media')}
+              onClick={() => navigateTo('media', '/media')}
               className="text-gray-700 hover:text-yellow-500 transition-colors text-left"
             >
               Media
             </button>
             <button 
-              onClick={() => scrollToSection('testimonials')}
+              onClick={() => navigateTo('testimonials', '/testimonials')}
               className="text-gray-700 hover:text-yellow-500 transition-colors text-left"
             >
               Testimonials
             </button>
             <button 
-              onClick={() => scrollToSection('contact')}
+              onClick={() => navigateTo('contact', '/contact')}
               className="text-gray-700 hover:text-yellow-500 transition-colors text-left"
             >
               Contact

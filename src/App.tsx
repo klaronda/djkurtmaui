@@ -13,6 +13,7 @@ import { AdminSignup } from './components/AdminSignup';
 // Use direct Supabase auth - no edge function needed!
 import { authAPI, photosAPI, mixesAPI, testimonialsAPI, venuesAPI, videoAPI } from './utils/api-direct';
 import { supabase } from './lib/supabase';
+import { scrollToSection } from './utils/scroll-section';
 
 interface Photo {
   id: string;
@@ -117,6 +118,8 @@ export default function App() {
                 ...prev.video,
                 url: videoRes.video.url,
                 posterImage: videoRes.video.posterImage || prev.video.posterImage,
+                title: videoRes.video.title || prev.video.title,
+                description: videoRes.video.description || prev.video.description,
               }
             : prev.video,
           photos: photosRes.photos ?? [],
@@ -130,6 +133,40 @@ export default function App() {
     };
 
     loadPublicContent();
+  }, []);
+
+  useEffect(() => {
+    const normalizePath = (path: string) => {
+      if (!path || path === '/') return '/';
+      return path.endsWith('/') ? path.slice(0, -1) || '/' : path;
+    };
+
+    const pathToSection: Record<string, string> = {
+      '/': 'home',
+      '/home': 'home',
+      '/about': 'about',
+      '/services': 'services',
+      '/media': 'media',
+      '/testimonials': 'testimonials',
+      '/contact': 'contact',
+      '/book': 'contact',
+      '/book-now': 'contact',
+    };
+
+    const scrollFromPath = () => {
+      const path = normalizePath(window.location.pathname);
+      const sectionId = pathToSection[path];
+      if (sectionId) {
+        scrollToSection(sectionId);
+      }
+    };
+
+    scrollFromPath();
+    window.addEventListener('popstate', scrollFromPath);
+
+    return () => {
+      window.removeEventListener('popstate', scrollFromPath);
+    };
   }, []);
 
   // Check authentication status and URL on mount
