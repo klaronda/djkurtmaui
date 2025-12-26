@@ -169,6 +169,47 @@ export default function App() {
     };
   }, []);
 
+  // Update canonical tag for SEO (fixes duplicate content issues)
+  useEffect(() => {
+    const updateCanonical = () => {
+      const path = window.location.pathname;
+      const baseUrl = 'https://djkurtmaui.com';
+      const canonicalUrl = `${baseUrl}${path === '/' ? '' : path}`;
+      
+      // Remove existing canonical tag if it exists
+      let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+      
+      if (!canonicalLink) {
+        // Create new canonical tag if it doesn't exist
+        canonicalLink = document.createElement('link');
+        canonicalLink.setAttribute('rel', 'canonical');
+        document.head.appendChild(canonicalLink);
+      }
+      
+      // Update the href
+      canonicalLink.setAttribute('href', canonicalUrl);
+    };
+
+    // Update on mount and when pathname changes
+    updateCanonical();
+    
+    // Listen for navigation changes
+    const handlePopState = () => updateCanonical();
+    window.addEventListener('popstate', handlePopState);
+    
+    // Also listen for pushState (when navigation happens programmatically)
+    const originalPushState = window.history.pushState;
+    window.history.pushState = function(...args) {
+      originalPushState.apply(window.history, args);
+      updateCanonical();
+    };
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.history.pushState = originalPushState;
+    };
+  }, []);
+
   // Check authentication status and URL on mount
   useEffect(() => {
     const checkAuth = async () => {
