@@ -1,0 +1,118 @@
+import { createClient } from '@supabase/supabase-js'
+
+/**
+ * DoneWell Health Adapter - Core Health Endpoint
+ * GET /api/health
+ * 
+ * Required environment variables:
+ * - VITE_SUPABASE_URL
+ * - VITE_SUPABASE_ANON_KEY
+ * - SITE_ID (default: klr_prod_001)
+ * - SITE_NAME (default: kevinlaronda.com)
+ * - ENVIRONMENT (default: production)
+ */
+
+interface HealthResponse {
+  site_id: string
+  site: string
+  environment: string
+  status: 'ok' | 'degraded' | 'error'
+  timestamp: string
+  version: string
+  checks: {
+    frontend: 'ok' | 'error'
+    cms: 'ok' | 'error'
+    forms: 'ok' | 'error'
+  }
+}
+
+export default async function handler(req: any, res: any) {
+  // Only allow GET requests
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  const supabaseUrl = process.env.VITE_SUPABASE_URL
+  const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
+  const siteId = process.env.SITE_ID || 'klr_prod_001'
+  const siteName = process.env.SITE_NAME || 'kevinlaronda.com'
+  const environment = process.env.ENVIRONMENT || 'production'
+  const version = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || 'dev'
+
+  const checks = {
+    frontend: 'ok' as const,
+    cms: 'ok' as 'ok' | 'error',
+    forms: 'ok' as 'ok' | 'error'
+  }
+
+  // CMS check - fetch 1 project with 300ms timeout
+  if (supabaseUrl && supabaseAnonKey) {
+    const supabase = createClient(supabaseUrl, supabaseAnonKey)
+    
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 300)
+
+      const { error: cmsError } = await supabase
+        .from('projects')
+        .select('id')
+        .limit(1)
+        .single()
+        .abortSignal(controller.signal)
+
+      clearTimeout(timeoutId)
+
+      if (cmsError && cmsError.code !== 'PGRST116') {
+        // PGRST116 = no rows found, which is ok
+        checks.cms = 'error'
+      }
+    } catch (err) {
+      checks.cms = 'error'
+    }
+
+    // Forms check - verify contact_submissions table is accessible
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 300)
+
+      const { error: formsError } = await supabase
+        .from('contact_submissions')
+        .select('id')
+        .limit(1)
+        .abortSignal(controller.signal)
+
+      clearTimeout(timeoutId)
+
+      if (formsError && formsError.code !== 'PGRST116') {
+        checks.forms = 'error'
+      }
+    } catch (err) {
+      checks.forms = 'error'
+    }
+  } else {
+    checks.cms = 'error'
+    checks.forms = 'error'
+  }
+
+  // Determine overall status
+  const allOk = checks.frontend === 'ok' && checks.cms === 'ok' && checks.forms === 'ok'
+  const anyError = checks.cms === 'error' || checks.forms === 'error'
+  const status = allOk ? 'ok' : anyError ? 'degraded' : 'ok'
+
+  const response: HealthResponse = {
+    site_id: siteId,
+    site: siteName,
+    environment,
+    status,
+    timestamp: new Date().toISOString(),
+    version,
+    checks
+  }
+
+  // Return 503 if any critical check fails
+  const httpStatus = checks.frontend === 'error' ? 503 : 200
+
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+  return res.status(httpStatus).json(response)
+}
+
