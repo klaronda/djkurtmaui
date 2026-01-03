@@ -54,10 +54,9 @@ export default async function handler(req: any, res: any) {
       const timeoutId = setTimeout(() => controller.abort(), 300)
 
       const { error: cmsError } = await supabase
-        .from('projects')
+        .from('testimonials')
         .select('id')
         .limit(1)
-        .single()
         .abortSignal(controller.signal)
 
       clearTimeout(timeoutId)

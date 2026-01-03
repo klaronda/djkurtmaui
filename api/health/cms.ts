@@ -42,7 +42,7 @@ export default async function handler(req: any, res: any) {
   try {
     // Lightweight query to measure CMS latency (just check if table is accessible)
     const { data, error } = await supabase
-      .from('projects')
+      .from('testimonials')
       .select('id')
       .limit(1)
 
