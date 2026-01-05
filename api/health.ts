@@ -67,7 +67,7 @@ export default async function handler(req: any, res: any) {
     
     try {
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 300)
+      const timeoutId = setTimeout(() => controller.abort(), 2000)
 
       const { error: cmsError } = await supabase
         .from('testimonials')
@@ -88,7 +88,7 @@ export default async function handler(req: any, res: any) {
     // Forms check - verify contact_submissions table is accessible
     try {
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 300)
+      const timeoutId = setTimeout(() => controller.abort(), 2000)
 
       const { error: formsError } = await supabase
         .from('contact_submissions')
