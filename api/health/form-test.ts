@@ -6,6 +6,13 @@
  * Used to detect silent form failures.
  */
 
+// CORS headers for cross-origin monitoring
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+}
+
 interface FormTestPayload {
   first_name?: string
   last_name?: string
@@ -65,10 +72,19 @@ function validateFormData(data: FormTestPayload): { valid: boolean; errors: stri
 }
 
 export default async function handler(req: any, res: any) {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    Object.entries(corsHeaders).forEach(([key, value]) => res.setHeader(key, value))
+    return res.status(204).end()
+  }
+
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
+
+  // Set CORS headers for all responses
+  Object.entries(corsHeaders).forEach(([key, value]) => res.setHeader(key, value))
 
   try {
     const payload: FormTestPayload = req.body || {}

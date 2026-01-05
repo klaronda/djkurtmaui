@@ -9,6 +9,13 @@
  * - DONEWELL_LOG_SECRET
  */
 
+// CORS headers for cross-origin monitoring
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, X-DoneWell-Secret',
+}
+
 interface LogPayload {
   site_id: string
   severity: 'sev-1' | 'sev-2' | 'sev-3'
@@ -26,10 +33,19 @@ interface LogResponse {
 }
 
 export default async function handler(req: any, res: any) {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    Object.entries(corsHeaders).forEach(([key, value]) => res.setHeader(key, value))
+    return res.status(204).end()
+  }
+
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
+
+  // Set CORS headers for all responses
+  Object.entries(corsHeaders).forEach(([key, value]) => res.setHeader(key, value))
 
   const secret = process.env.DONEWELL_LOG_SECRET
   const providedSecret = req.headers['x-donewell-secret']

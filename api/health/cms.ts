@@ -8,6 +8,13 @@ import { createClient } from '@supabase/supabase-js'
  * Allows monitoring to distinguish "site up" vs "content broken."
  */
 
+// CORS headers for cross-origin monitoring
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+}
+
 interface CMSHealthResponse {
   status: 'ok' | 'error'
   provider: string
@@ -17,10 +24,19 @@ interface CMSHealthResponse {
 }
 
 export default async function handler(req: any, res: any) {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    Object.entries(corsHeaders).forEach(([key, value]) => res.setHeader(key, value))
+    return res.status(204).end()
+  }
+
   // Only allow GET requests
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
+
+  // Set CORS headers for all responses
+  Object.entries(corsHeaders).forEach(([key, value]) => res.setHeader(key, value))
 
   const supabaseUrl = process.env.VITE_SUPABASE_URL
   const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
