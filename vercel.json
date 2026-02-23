@@ -1,4 +1,19 @@
 {
+  "buildCommand": "npm run build",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "header",
+          "key": "x-forwarded-proto",
+          "value": "http"
+        }
+      ],
+      "destination": "https://djkurtmaui.com/$1",
+      "statusCode": 301
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/health",
@@ -19,6 +34,30 @@
     {
       "source": "/api/health/deploy",
       "destination": "/api/health/deploy"
+    },
+    {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/services",
+      "destination": "/services.html"
+    },
+    {
+      "source": "/media",
+      "destination": "/media.html"
+    },
+    {
+      "source": "/testimonials",
+      "destination": "/testimonials.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact.html"
+    },
+    {
+      "source": "/book",
+      "destination": "/book.html"
     },
     {
       "source": "/(.*)",
