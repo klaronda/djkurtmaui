@@ -171,10 +171,31 @@ export default function App() {
 
   // Update canonical tag for SEO (fixes duplicate content issues)
   useEffect(() => {
+    const normalizeCanonicalPath = (path: string) => {
+      if (!path || path === '/') return '';
+
+      let normalized = path;
+      if (normalized.endsWith('.html')) {
+        normalized = normalized.slice(0, -5);
+      }
+
+      if (normalized !== '/' && normalized.endsWith('/')) {
+        normalized = normalized.slice(0, -1);
+      }
+
+      // Keep canonical URLs scoped to public marketing routes.
+      const allowedPaths = new Set(['', '/about', '/services', '/media', '/testimonials', '/contact', '/book']);
+      if (!allowedPaths.has(normalized)) {
+        return '';
+      }
+
+      return normalized;
+    };
+
     const updateCanonical = () => {
-      const path = window.location.pathname;
+      const path = normalizeCanonicalPath(window.location.pathname);
       const baseUrl = 'https://djkurtmaui.com';
-      const canonicalUrl = `${baseUrl}${path === '/' ? '' : path}`;
+      const canonicalUrl = `${baseUrl}${path}`;
       
       // Remove existing canonical tag if it exists
       let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;

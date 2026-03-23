@@ -5,12 +5,58 @@
       "source": "/(.*)",
       "has": [
         {
+          "type": "host",
+          "value": "www.djkurtmaui.com"
+        }
+      ],
+      "destination": "https://djkurtmaui.com/$1",
+      "statusCode": 301
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
           "type": "header",
           "key": "x-forwarded-proto",
           "value": "http"
         }
       ],
       "destination": "https://djkurtmaui.com/$1",
+      "statusCode": 301
+    },
+    {
+      "source": "/(.*)\\.html",
+      "destination": "/$1",
+      "statusCode": 301
+    },
+    {
+      "source": "/about/",
+      "destination": "/about",
+      "statusCode": 301
+    },
+    {
+      "source": "/services/",
+      "destination": "/services",
+      "statusCode": 301
+    },
+    {
+      "source": "/media/",
+      "destination": "/media",
+      "statusCode": 301
+    },
+    {
+      "source": "/testimonials/",
+      "destination": "/testimonials",
+      "statusCode": 301
+    },
+    {
+      "source": "/contact/",
+      "destination": "/contact",
+      "statusCode": 301
+    },
+    {
+      "source": "/book/",
+      "destination": "/book",
       "statusCode": 301
     }
   ],
@@ -34,30 +80,6 @@
     {
       "source": "/api/health/deploy",
       "destination": "/api/health/deploy"
-    },
-    {
-      "source": "/about",
-      "destination": "/about.html"
-    },
-    {
-      "source": "/services",
-      "destination": "/services.html"
-    },
-    {
-      "source": "/media",
-      "destination": "/media.html"
-    },
-    {
-      "source": "/testimonials",
-      "destination": "/testimonials.html"
-    },
-    {
-      "source": "/contact",
-      "destination": "/contact.html"
-    },
-    {
-      "source": "/book",
-      "destination": "/book.html"
     },
     {
       "source": "/(.*)",
