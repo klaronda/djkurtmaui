@@ -42,22 +42,31 @@ export function Contact() {
       });
 
       // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        eventType: '',
-        eventDate: '',
-        message: ''
-      });
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      eventType: '',
+      eventDate: '',
+      message: ''
+    });
 
       // Clear success message after 5 seconds
       setTimeout(() => setSubmitStatus(null), 5000);
     } catch (error: any) {
       console.error('Form submission error:', error);
+
+      const rawMessage = (error?.message || '').toString()
+      const isRls = rawMessage.toLowerCase().includes('row-level security')
+      const isUnauthorized = rawMessage.toLowerCase().includes('unauthorized')
+      const friendlyMessage =
+        isRls || isUnauthorized
+          ? "Sorry — we couldn’t send your message right now. Please call/text (808) 268-2272 or email djkurtmaui@gmail.com and we’ll take care of you."
+          : "Sorry — something went wrong sending your message. Please try again, or call/text (808) 268-2272."
+
       setSubmitStatus({
         type: 'error',
-        message: error.message || 'Failed to send message. Please try again or contact me directly.'
+        message: friendlyMessage
       });
     } finally {
       setIsSubmitting(false);

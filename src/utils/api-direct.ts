@@ -74,11 +74,29 @@ export const videoAPI = {
       .maybeSingle()
     
     if (error) throw new Error(error.message)
-    if (!data) return { video: { url: '', posterImage: '' } }
-    return { video: { url: data.url, posterImage: data.poster_image || '' } }
+    if (!data) {
+      return { video: { url: '', posterImage: '', title: '', description: '' } }
+    }
+
+    return {
+      video: {
+        url: data.url,
+        posterImage: data.poster_image || '',
+        title: data.title || '',
+        description: data.description || ''
+      }
+    }
   },
 
-  update: async (video: { url: string; posterImage?: string }) => {
+  update: async (video: { url: string; posterImage?: string; title?: string; description?: string }) => {
+    const payload = {
+      url: video.url,
+      poster_image: video.posterImage || null,
+      title: video.title ?? null,
+      description: video.description ?? null,
+      is_active: true,
+    }
+
     // Check if record exists
     const { data: existing } = await supabase
       .from('featured_videos')
@@ -91,23 +109,39 @@ export const videoAPI = {
       // Update existing
       const { data, error } = await supabase
         .from('featured_videos')
-        .update({ url: video.url, poster_image: video.posterImage || null })
+        .update(payload)
         .eq('id', existing.id)
         .select()
         .single()
       
       if (error) throw new Error(error.message)
-      return { success: true, video: { url: data.url, posterImage: data.poster_image || '' } }
+      return {
+        success: true,
+        video: {
+          url: data.url,
+          posterImage: data.poster_image || '',
+          title: data.title || '',
+          description: data.description || ''
+        }
+      }
     } else {
       // Insert new
       const { data, error } = await supabase
         .from('featured_videos')
-        .insert({ url: video.url, poster_image: video.posterImage || null, is_active: true })
+        .insert(payload)
         .select()
         .single()
       
       if (error) throw new Error(error.message)
-      return { success: true, video: { url: data.url, posterImage: data.poster_image || '' } }
+      return {
+        success: true,
+        video: {
+          url: data.url,
+          posterImage: data.poster_image || '',
+          title: data.title || '',
+          description: data.description || ''
+        }
+      }
     }
   },
 }
@@ -432,18 +466,22 @@ export const contactAPI = {
   submit: async (formData: { name: string; email: string; phone?: string; message: string; eventDate?: string; eventType?: string }) => {
     console.log('Submitting contact form:', { name: formData.name, email: formData.email, eventType: formData.eventType || 'other' })
     
-    const { data: submission, error } = await supabase
-      .from('contact_submissions')
-      .insert({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone || null,
-        message: formData.message,
-        event_date: formData.eventDate || null,
-        event_type: formData.eventType || 'other' // Required field
-      })
-      .select()
-      .single()
+    const trimmedName = (formData.name || '').trim()
+    const [firstNameRaw, ...lastNameParts] = trimmedName.split(/\s+/).filter(Boolean)
+    const firstName = firstNameRaw || trimmedName || 'Unknown'
+    const lastName = lastNameParts.join(' ')
+
+    // Use a SECURITY DEFINER RPC to avoid brittle client-side RLS issues.
+    const { data: submissionId, error } = await supabase.rpc('submit_contact_submission', {
+      p_first_name: firstName,
+      p_last_name: lastName,
+      p_name: trimmedName,
+      p_email: formData.email,
+      p_phone: formData.phone || null,
+      p_message: formData.message,
+      p_event_type: formData.eventType || 'other',
+      p_event_date: formData.eventDate || null,
+    })
 
     if (error) {
       console.error('Contact form submission error:', error)
@@ -456,8 +494,8 @@ export const contactAPI = {
       throw new Error(error.message)
     }
     
-    console.log('Contact form submitted successfully:', submission)
-    return { success: true, id: submission.id.toString() }
+    console.log('Contact form submitted successfully:', submissionId)
+    return { success: true, id: submissionId?.toString?.() ?? String(submissionId) }
   },
 
   getAll: async () => {

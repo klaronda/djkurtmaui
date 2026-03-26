@@ -29,7 +29,6 @@ export function Hero() {
           className={`w-full h-full object-cover transition-opacity duration-1000 ease-out ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
           loading="eager"
           decoding="async"
-          fetchPriority="high"
           sizes="100vw"
           onLoad={() => setImageLoaded(true)}
         />
